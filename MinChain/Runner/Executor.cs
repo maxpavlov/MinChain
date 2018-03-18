@@ -26,6 +26,9 @@ namespace MinChain
         // This dictionary is a mapping from ancestor block ID to the list of
         // block IDs of decendants.  The decendants will be processed after the
         // ancestor is successfuly connected.
+        //
+        // SM: this node may receive blocks in different order than their order.
+        // for example, this may receive block 1--> block3-->block 2.
         readonly Dictionary<ByteString, List<ByteString>> floatingBlocks;
 
         // UTXO (Unspent Transaction Output) is a unit of recipient information
@@ -94,6 +97,8 @@ namespace MinChain
             // evaluate the difficulty then again.
             if (Latest.TotalDifficulty >= block.TotalDifficulty)
             {
+                //'block' .... new block received.
+                // 'Latest' ... blockchain this node keeps before receiving the new block above.
                 CheckFloatingBlocks(block.Id);
                 return;
             }
@@ -101,6 +106,8 @@ namespace MinChain
             // Otherwise, try to execute the block.  Considering the block folk,
             // first revert all the applied blocks prior to the fork point in
             // past blocks, if exists.  Then apply blocks after the fork.
+            //
+            // SM: related keyword - 'selfish mining'
             var fork = BlockchainUtil.LowestCommonAncestor(
                 Latest, block, Blocks);
             var revertingChain = Latest.Ancestors(Blocks)
@@ -134,6 +141,8 @@ namespace MinChain
             {
                 // Failure occurred during the block execution.  Perform
                 // opposite to revert to the state before the execution.
+                //
+                // SM: this happens when the block is corrupted.
                 applyingChain.Take(failureIndex.Value)
                     .Reverse().ToList().ForEach(Revert);
 
@@ -191,6 +200,11 @@ namespace MinChain
             BlockExecuted();
         }
 
+        //to maintain UTXO.
+        //one way of thinking is to throw away the old chain and start from
+        // lowest common ancestor. however, if you do so, you need to calculate
+        // utxo from genesis block, which is time consuming (alternatively you
+        // can cache utxo for each block, which is memory consuming).
         void Revert(Block block)
         {
             logger.LogWarning($@"Reverting Block {block.Height}:{
@@ -309,6 +323,8 @@ namespace MinChain
             block.TotalDifficulty = Latest.TotalDifficulty + block.Difficulty;
         }
 
+        //SM: this becomes public, because mining code would also like
+        //to resuse this code.
         public void Run(Transaction tx,
             DateTime blockTime, ulong coinbase = 0,
             List<TransactionOutput> spentTxo = null)

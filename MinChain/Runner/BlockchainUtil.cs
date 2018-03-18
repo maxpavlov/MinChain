@@ -19,6 +19,7 @@ namespace MinChain
             }
         }
 
+        //SM: find a block which a fork happened.
         public static Block LowestCommonAncestor(Block b1, Block b2,
             Dictionary<ByteString, Block> blocks)
         {
@@ -38,6 +39,8 @@ namespace MinChain
             return null;
         }
 
+        // SM: this isn't merkle tree
+        // TODO: calculate merkle tree.
         public static byte[] RootHashTransactionIds(IList<ByteString> txIds)
         {
             const int HashLength = 32;

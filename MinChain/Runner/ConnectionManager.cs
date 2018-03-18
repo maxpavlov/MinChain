@@ -10,6 +10,9 @@ using static MessagePack.MessagePackSerializer;
 
 namespace MinChain
 {
+    //handles connections with the peers. There are two cases
+    //1. this node initiates connections to the other peers
+    //2. other nodes initiate connections to this node.
     public class ConnectionManager : IDisposable
     {
         static readonly ILogger logger = Logging.Logger<ConnectionManager>();
@@ -64,6 +67,8 @@ namespace MinChain
             peers.Clear();
         }
 
+        //note that this is not public method - only called from "Start" of this instance.
+        //This enables other nodes to initiate connections to this node.
         async Task Listen(IPEndPoint localEndpoint)
         {
             var listener = new TcpListener(
@@ -122,6 +127,9 @@ namespace MinChain
             AddPeer(cl);
         }
 
+        //here we just add a peer without checking.
+        //bitcoin uses gossip protocol to exchange information about
+        //peers if they can be trusted or not.
         void AddPeer(TcpClient peer)
         {
             var connectionInfo = new ConnectionInfo(peer);

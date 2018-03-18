@@ -6,9 +6,11 @@ using System.Linq;
 
 namespace MinChain
 {
+    // SM: definition of block.
     [MessagePackObject]
     public class Block
     {
+        //SM: to keep the original byte array.
         [IgnoreMember, JsonIgnore]
         public byte[] Original { get; set; }
 
@@ -30,6 +32,9 @@ namespace MinChain
         [Key(4), JsonProperty(PropertyName = "root")]
         public virtual byte[] TransactionRootHash { get; set; }
 
+        // from blockchain perspective, we don't have to calculate hash
+        // with key5 and key6, however, to communicate blocks we need transactions.
+        // 
         [Key(5), JsonIgnore]
         public virtual IList<ByteString> TransactionIds { get; set; }
 
@@ -64,6 +69,11 @@ namespace MinChain
             };
     }
 
+    //SM: why transaction contains multiple in and out?
+    // OUT:For example, if you have 100 BTC, and you only want to send 10 BTC to A.
+    // then you need multiple out transactions ( 10 to A, 90 to yourself).
+    // IN: For example, you want to pay 100BTC, but you don't have one UTXO with 100BTC.
+    // in this case, you can add multiple transactions as input so that you can pay.
     [MessagePackObject]
     public class Transaction
     {
@@ -73,12 +83,21 @@ namespace MinChain
         [IgnoreMember, JsonProperty(PropertyName = "id")]
         public ByteString Id { get; set; }
 
+        // SM: timestamp is when the transaction was created, however, 
+        //this isn't so meaningful information because
+        //Transaction is finalized when it is included in block.
         [Key(0), JsonProperty(PropertyName = "timestamp")]
         public virtual DateTime Timestamp { get; set; }
 
+        // SM: from which transactions this transaction received the coin 
+        // question: 
         [Key(1), JsonProperty(PropertyName = "in")]
         public virtual IList<InEntry> InEntries { get; set; }
 
+        // SM: to which address this transaction sends the coin.
+        // in case of bitcoin, sum of coins in "in" is greator than sum of coins of "out",
+        // because the miner takes transaction fees.
+        // In MinChain, we don't consider about the transaction fee.
         [Key(2), JsonProperty(PropertyName = "out")]
         public virtual IList<OutEntry> OutEntries { get; set; }
 

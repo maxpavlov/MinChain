@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
+using static System.Console;
+
 
 namespace MinChain
 {
@@ -25,6 +27,11 @@ namespace MinChain
 
             var d = BitConverter.ToDouble(bytes.ToArray(), 0);
             return Math.Pow(2, -35) / (d - 1);
+        }
+
+        public static void Main(string[] args){
+            byte[] b = HexConvert.ToBytes("0000123");
+            WriteLine(Difficulty(b));
         }
     }
 }

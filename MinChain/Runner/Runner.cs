@@ -115,6 +115,8 @@ namespace MinChain
             return true;
         }
 
+        // This enables to expand p2p network.
+        //
         void NewPeer(int peerId)
         {
             var peers = connectionManager.GetPeers()

@@ -10,14 +10,18 @@ namespace MinChain
     {
         public const int MaximumBlockSize = 1024 * 1024; // 1MB
 
+        // Hastable of blocks which this node has.
         public Dictionary<ByteString, byte[]> Blocks { get; }
             = new Dictionary<ByteString, byte[]>();
+
         public Dictionary<ByteString, Transaction> MemoryPool { get; }
             = new Dictionary<ByteString, Transaction>();
 
         public ConnectionManager ConnectionManager { get; set; }
         public Executor Executor { get; set; }
 
+
+        //Called by connection manager.
         public Task HandleMessage(InventoryMessage message, int peerId)
         {
             switch (message.Type)
@@ -29,6 +33,11 @@ namespace MinChain
             }
         }
 
+        //If a node receives a block, it advertises the fact to the other nodes.
+        //If you receive an advertise, check if you have the block or not.
+        //If you don't have the block, request the block.
+        //
+        // "advertise message" contains ID and type(block or transaction)
         async Task HandleAdvertise(InventoryMessage message, int peerId)
         {
             // Data should not contain anything. (To prevent DDoS)
@@ -117,6 +126,8 @@ namespace MinChain
 
             message.Type = Advertise;
             message.Data = null;
+
+            //tell the others about the new block or transaction
             await ConnectionManager.BroadcastAsync(message, peerId);
         }
     }

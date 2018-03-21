@@ -29,9 +29,9 @@ namespace MinChain
             return Math.Pow(2, -35) / (d - 1);
         }
 
-        public static void Main(string[] args){
-            byte[] b = HexConvert.ToBytes("0000123");
-            WriteLine(Difficulty(b));
-        }
+        //public static void Main(string[] args){
+        //    byte[] b = HexConvert.ToBytes("0000123");
+        //    WriteLine(Difficulty(b));
+        //}
     }
 }

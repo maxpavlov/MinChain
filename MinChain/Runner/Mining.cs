@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -154,7 +154,7 @@ namespace MinChain
                 PreviousHash = Executor.Latest.Id,
                 Difficulty = BlockParameter.GetNextDifficulty(
                     Executor.Latest.Ancestors(Executor.Blocks)),
-                TransactionRootHash = RootHashTransactionIds(txIds),
+                MerkleRoot = CalculateMerkleRoot(txs),
             };
 
             if (!Mine(block, token)) return;

@@ -30,7 +30,7 @@ namespace MinChain
         public virtual DateTime Timestamp { get; set; }
 
         [Key(4), JsonProperty(PropertyName = "root")]
-        public virtual byte[] TransactionRootHash { get; set; }
+        public virtual byte[] MerkleRoot { get; set; }
 
         // from blockchain perspective, we don't have to calculate hash
         // with key5 and key6, however, to communicate blocks we need transactions.
@@ -59,7 +59,7 @@ namespace MinChain
                 Difficulty = Difficulty,
                 Nonce = Nonce,
                 Timestamp = Timestamp,
-                TransactionRootHash = TransactionRootHash,
+                MerkleRoot = MerkleRoot,
                 TransactionIds = TransactionIds?.ToList(),
                 Transactions = Transactions?.ToList(),
                 Height = Height,

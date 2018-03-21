@@ -37,10 +37,16 @@ namespace MinChain
             connectionManager.NewConnectionEstablished += NewPeer;
             connectionManager.MessageReceived += HandleMessage;
             executor.BlockExecuted += miner.Notify;
+            //executor.BlockExecuted += savfile;
 
             inventoryManager.ConnectionManager = connectionManager;
             inventoryManager.Executor = executor;
+
             executor.InventoryManager = inventoryManager;
+
+
+
+
             miner.ConnectionManager = connectionManager;
             miner.InventoryManager = inventoryManager;
             miner.Executor = executor;
@@ -170,6 +176,10 @@ namespace MinChain
             // Send request for unknown blocks.
             foreach (var message in messages)
                 await connectionManager.SendAsync(message, peerId);
+        }
+
+        void savefile(){
+            
         }
     }
 }

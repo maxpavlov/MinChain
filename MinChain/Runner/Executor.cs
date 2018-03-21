@@ -259,8 +259,20 @@ namespace MinChain
 
             var blockTime = block.Timestamp;
             var txCount = block.Transactions.Count;
-            var rootTxHash = BlockchainUtil.RootHashTransactionIds(
-                block.TransactionIds);
+
+            // Deserialize transactions and check IDs.
+            var transactions = new Transaction[txCount];
+            for (var i = 0; i < txCount; i++)
+            {
+                var tx = BlockchainUtil.DeserializeTransaction(
+                    block.Transactions[i]);
+
+                if (!tx.Id.Equals(block.TransactionIds[i]))
+                    throw new ArgumentException();
+                transactions[i] = tx;
+            }
+
+            var merkleRoot = BlockchainUtil.CalculateMerkleRoot(transactions.ToList());
             var difficulty = BlockParameter.GetNextDifficulty(
                 block.Ancestors(Blocks).Skip(1));
 
@@ -276,7 +288,7 @@ namespace MinChain
             if (blockTime > DateTime.UtcNow ||
                 blockTime < Latest.Timestamp ||
                 txCount == 0 || txCount != block.TransactionIds.Count ||
-                !rootTxHash.SequenceEqual(block.TransactionRootHash) ||
+                !merkleRoot.SequenceEqual(block.MerkleRoot) ||
                 !Latest.Id.Equals(block.PreviousHash) ||
                 block.Difficulty >= difficulty * (1 + 1e-15) ||
                 block.Difficulty <= difficulty * (1 - 1e-15) ||
@@ -285,17 +297,7 @@ namespace MinChain
                 throw new ArgumentException();
             }
 
-            // Deserialize transactions and check IDs.
-            var transactions = new Transaction[txCount];
-            for (var i = 0; i < txCount; i++)
-            {
-                var tx = BlockchainUtil.DeserializeTransaction(
-                    block.Transactions[i]);
 
-                if (!tx.Id.Equals(block.TransactionIds[i]))
-                    throw new ArgumentException();
-                transactions[i] = tx;
-            }
 
             // Run normal transactions.
             ulong coinbase = BlockParameter.GetCoinbase(Latest.Height + 1);

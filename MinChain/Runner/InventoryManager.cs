@@ -21,6 +21,10 @@ namespace MinChain
         public Executor Executor { get; set; }
 
 
+        public InventoryManager(){
+            //load existing file
+        }
+
         //Called by connection manager.
         public Task HandleMessage(InventoryMessage message, int peerId)
         {

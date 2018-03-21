@@ -41,9 +41,11 @@ namespace MinChain
 
         // SM: this isn't merkle tree
         // TODO: calculate merkle tree.
-        public static byte[] RootHashTransactionIds(IList<ByteString> txIds)
+
+        private static byte[] RootHashTransactionIds(IList<ByteString> txIds)
         {
             const int HashLength = 32;
+
 
             var i = 0;
             var ids = new byte[txIds.Count * HashLength];
@@ -54,6 +56,35 @@ namespace MinChain
             }
 
             return Hash.ComputeDoubleSHA256(ids);
+        }
+        public static byte[] CalculateMerkleRoot(List<Transaction> txs)
+        {
+            if (txs.Count == 0) return null;//shouldn't happen(?)
+
+            var hashlist = txs.ConvertAll(tx => Hash.ComputeDoubleSHA256(Serialize(tx)));
+
+            while(hashlist.Count > 1){
+                if( hashlist.Count % 2  !=0){
+                    hashlist.Add(hashlist[hashlist.Count - 1]);
+                }
+
+                List<byte[]> newHashList = new List<byte[]>();
+
+                for (int i = 0; i < hashlist.Count; i+=2){
+                    var first = hashlist[i];
+                    var second = hashlist[i + 1];
+                    var concat = new byte[first.Length + second.Length];
+                    System.Buffer.BlockCopy(first, 0, concat,0, first.Length);
+                    System.Buffer.BlockCopy(second, 0, concat, first.Length,second.Length);
+                    var newroot = Hash.ComputeDoubleSHA256(concat);
+                    newHashList.Add(newroot);
+                }
+
+                hashlist = newHashList;
+            }
+            return hashlist[0];
+
+           
         }
 
         public static Block DeserializeBlock(byte[] data)

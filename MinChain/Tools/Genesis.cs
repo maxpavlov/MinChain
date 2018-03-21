@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +27,7 @@ namespace MinChain
 
             var tx = Mining.CreateCoinbase(0, ToAddress(keyPair.PublicKey));
             var txIds = new List<ByteString> { tx.Id };
-            var root = RootHashTransactionIds(txIds);
+            var root = CalculateMerkleRoot(new List<Transaction>{tx});
 
             var b = new Block
             {
@@ -35,7 +35,7 @@ namespace MinChain
                 Difficulty = Difficulty,
                 Nonce = 0,
                 Timestamp = DateTime.UtcNow,
-                TransactionRootHash = root,
+                MerkleRoot = root,
                 TransactionIds = txIds,
                 Transactions = new List<byte[]> { tx.Original },
                 ParsedTransactions = new[] { tx }

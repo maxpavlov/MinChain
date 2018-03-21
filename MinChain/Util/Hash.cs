@@ -14,6 +14,7 @@ namespace MinChain
                 return sha256.ComputeHash(bytes);
         }
 
+        //typicall they use doublehash to be defensive against birthday attack.
         public static byte[] ComputeDoubleSHA256(byte[] bytes)
         {
             using (var sha256 = SHA256.Create())

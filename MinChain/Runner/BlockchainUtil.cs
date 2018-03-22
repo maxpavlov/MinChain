@@ -73,7 +73,6 @@ namespace MinChain
                 for (int i = 0; i < hashlist.Count; i+=2){
                     var first = hashlist[i];
                     var second = hashlist[i + 1];
-
                     //hashsize is 32byte (256bit), so this could be written as 64 instead, though.
                     var concat = new byte[first.Length + second.Length];
                     System.Buffer.BlockCopy(first, 0, concat,0, first.Length);

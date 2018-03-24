@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using static MinChain.InventoryMessageType;
 using static MessagePack.MessagePackSerializer;
+using Newtonsoft.Json;
 
 namespace MinChain
 {
@@ -133,5 +134,32 @@ namespace MinChain
             //tell the others about the new block or transaction
             await ConnectionManager.BroadcastAsync(message, peerId);
         }
+
+        public Block TryLoadBlock(ByteString id, byte[] data)
+        {
+            // Data should not exceed the maximum size.
+            if (data.Length > MaximumBlockSize)
+                throw new ArgumentException(nameof(data));
+
+            // Integrity check.
+            var computedId = BlockchainUtil.ComputeBlockId(data);
+            if (!ByteString.CopyFrom(computedId).Equals(id))
+                throw new ArgumentException(nameof(id));
+
+            // Try to deserialize the data for format validity check.
+            var block = BlockchainUtil.DeserializeBlock(data);
+
+            lock (Blocks)
+            {
+                if (Blocks.ContainsKey(id)) return null;
+                Blocks.Add(id, data);
+            }
+
+            // Schedule the block for execution.
+            Executor.ProcessBlock(block);
+
+            return block;
+        }
     }
+
 }

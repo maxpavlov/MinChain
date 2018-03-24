@@ -18,6 +18,9 @@ namespace MinChain
         [JsonProperty(PropertyName = "genesis")]
         public string GenesisPath { get; set; }
 
+        [JsonProperty(PropertyName = "storage")]
+        public string StoragePath { get; set; }
+
         [JsonProperty(PropertyName = "mining")]
         public bool Mining { get; set; }
 

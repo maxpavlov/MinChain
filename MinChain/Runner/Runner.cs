@@ -1,9 +1,13 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static MessagePack.MessagePackSerializer;
 
@@ -24,6 +28,7 @@ namespace MinChain
         InventoryManager inventoryManager;
         Executor executor;
         Mining miner;
+        Storage storage;
 
         void RunInternal(string[] args)
         {
@@ -33,6 +38,7 @@ namespace MinChain
             inventoryManager = new InventoryManager();
             executor = new Executor();
             miner = new Mining();
+            storage = new Storage(config.StoragePath, executor);
 
             connectionManager.NewConnectionEstablished += NewPeer;
             connectionManager.MessageReceived += HandleMessage;
@@ -45,14 +51,23 @@ namespace MinChain
             executor.InventoryManager = inventoryManager;
 
 
-
-
             miner.ConnectionManager = connectionManager;
             miner.InventoryManager = inventoryManager;
             miner.Executor = executor;
 
             inventoryManager.Blocks.Add(genesis.Id, genesis.Original);
             executor.ProcessBlock(genesis);
+
+            //process saved blocks
+
+            foreach(var (id, block) in storage.LoadAll()){
+                inventoryManager.TryLoadBlock(id, block);
+            }
+
+
+            //add save handler
+            executor.BlockExecuted += storage.SaveBlock;
+            //read all blocks
 
             connectionManager.Start(config.ListenOn);
             var t = Task.Run(async () =>
@@ -67,9 +82,35 @@ namespace MinChain
                 miner.Start();
             }
 
+
+            var web = new WebHostBuilder()
+                 .UseKestrel()
+                 .UseUrls("http://*:8881")
+                 .Configure(app => app.Run(Handle))
+                 .Build();
+
+           web.Run();
+
+
             Console.ReadLine();
 
             connectionManager.Dispose();
+        }
+        public async Task Handle(HttpContext request)
+        {
+            byte[] buf = null;
+
+            if (request.Request.Path.ToString().Contains("latest"))
+            {
+                var json = JsonConvert.SerializeObject(executor.Latest, Formatting.Indented);
+
+                buf = Encoding.ASCII.GetBytes(json);
+            }
+            //else if(request.Request.Path =="list"){
+                
+            //}
+
+            await request.Response.Body.WriteAsync(buf, 0, buf.Length);
         }
 
         bool LoadConfiguration(string[] args)
@@ -104,7 +145,6 @@ namespace MinChain
                     exp);
                 return false;
             }
-
             try
             {
                 var bytes = File.ReadAllBytes(config.GenesisPath);
@@ -178,8 +218,9 @@ namespace MinChain
                 await connectionManager.SendAsync(message, peerId);
         }
 
-        void savefile(){
-            
+        void savefile()
+        {
+
         }
     }
 }

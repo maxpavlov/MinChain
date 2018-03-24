@@ -7,6 +7,7 @@ namespace MinChain
     {
         public static void Exec(string[] args)
         {
+            
             byte[] publicKey;
             byte[] privateKey;
             EccService.GenerateKey(out privateKey, out publicKey);

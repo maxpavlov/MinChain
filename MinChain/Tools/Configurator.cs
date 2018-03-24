@@ -18,6 +18,7 @@ namespace MinChain
                     InitialEndpoints = new[] { defaultRemote },
                     KeyPairPath = "<YOUR OWN KEYPAIR>.json",
                     GenesisPath = "<GENESIS BLOCK>.bin",
+                    StoragePath = "<storage path>",
                     Mining = true,
                 },
                 Formatting.Indented);

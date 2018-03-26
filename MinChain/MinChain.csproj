@@ -14,12 +14,15 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.2" />
+    <PackageReference Include="BouncyCastle" Version="1.8.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="test\EmptyClass.cs" />
+    <Compile Remove="Tools\MsgPackEdu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="docs\README.txt" />
+    <None Remove=".DS_Store" />
   </ItemGroup>
 </Project>

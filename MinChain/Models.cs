@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace MinChain
 {
+
     // SM: definition of block.
     [MessagePackObject]
     public class Block

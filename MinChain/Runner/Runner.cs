@@ -21,7 +21,8 @@ namespace MinChain
             new Runner().RunInternal(args);
 
         Configuration config;
-        KeyPair myKeys;
+
+        Wallet.HierachicalWallet hwallet;
         Block genesis;
 
         ConnectionManager connectionManager;
@@ -78,7 +79,7 @@ namespace MinChain
 
             if (config.Mining)
             {
-                miner.RecipientAddress = ByteString.CopyFrom(myKeys.Address);
+                miner.RecipientAddress = hwallet.Wallets[0].Address;
                 miner.Start();
             }
 
@@ -136,7 +137,11 @@ namespace MinChain
 
             try
             {
-                myKeys = KeyPair.LoadFrom(config.KeyPairPath);
+                KeyPair seedKeyPair = KeyPair.LoadFrom(config.KeyPairPath);
+                hwallet = new Wallet.HierachicalWallet(seedKeyPair);
+                hwallet.init(10);
+                hwallet.dumpAll();
+                System.Threading.Thread.Sleep(3000);
             }
             catch (Exception exp)
             {

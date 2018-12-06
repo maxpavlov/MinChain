@@ -44,7 +44,6 @@ namespace MinChain
             connectionManager.NewConnectionEstablished += NewPeer;
             connectionManager.MessageReceived += HandleMessage;
             executor.BlockExecuted += miner.Notify;
-            //executor.BlockExecuted += savfile;
 
             inventoryManager.ConnectionManager = connectionManager;
             inventoryManager.Executor = executor;
@@ -64,7 +63,6 @@ namespace MinChain
             foreach(var (id, block) in storage.LoadAll()){
                 inventoryManager.TryLoadBlock(id, block);
             }
-
 
             //add save handler
             executor.BlockExecuted += storage.SaveBlock;
@@ -114,9 +112,8 @@ namespace MinChain
 
                 buf = Encoding.ASCII.GetBytes(json);
             }
-            //else if(request.Request.Path =="list"){
-                
-            //}
+
+            //Add other commands to process here
 
             await request.Response.Body.WriteAsync(buf, 0, buf.Length);
         }

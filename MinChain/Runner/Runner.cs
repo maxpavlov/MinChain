@@ -83,14 +83,21 @@ namespace MinChain
                 miner.Start();
             }
 
+            try
+            {
 
-            var web = new WebHostBuilder()
-                 .UseKestrel()
-                 .UseUrls("http://*:8881")
-                 .Configure(app => app.Run(Handle))
-                 .Build();
+                var web = new WebHostBuilder()
+                    .UseKestrel()
+                    .UseUrls("http://*:8881")
+                    .Configure(app => app.Run(Handle))
+                    .Build();
 
-           web.Run();
+                web.Run();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Port 8881 is in use. Web interface to poll the blockchain state is not going to be available for this node.");
+            }
 
 
             Console.ReadLine();

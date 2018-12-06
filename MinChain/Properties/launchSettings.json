@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MinChain": {
+      "commandName": "Project",
+      "commandLineArgs": "run config.json"
+    }
+  }
+}

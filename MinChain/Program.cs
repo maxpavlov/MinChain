@@ -6,9 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using static System.Console;
 
+/*
+ * dotnet MinChain.dll genkey > key.json
+ * dotnet MinChain.dll genesis key.json genesis.bin //OPTIONAL, GENERATE ONLY ONCE
+ * dotnet MinChain.dll config > config.json
+ * dotnet MinChain.dll run config.json 
+ */
+
 namespace MinChain
 {
-    // Taken from https://msdn.microsoft.com/magazine/mt694089.aspx
     public static class Logging
     {
         public static ILoggerFactory Factory { get; } = new LoggerFactory();
@@ -21,8 +27,8 @@ namespace MinChain
             new Dictionary<string, Action<string[]>>
             {
                 { "genkey", KeyGenerator.Exec },
-                { "config", Configurator.Exec },
                 { "genesis", Genesis.Exec },
+                { "config", Configurator.Exec },               
                 { "run", Runner.Run },
             };
 
